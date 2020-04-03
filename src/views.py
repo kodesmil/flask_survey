@@ -2,21 +2,23 @@ from flask import Blueprint, request, jsonify
 from flask_apispec import marshal_with, doc
 from kodesmil_common.auth import requires_auth
 from kodesmil_common.user_schema import get_user
+import os
+import firebase_admin
+from firebase_admin import auth
 
 from . import db
 from .models import AnswerSchema, QuestionSchema
 
 content = Blueprint('content', __name__)
-
+firebase_app = firebase_admin.initialize_app()
 
 @doc(tags=['Answer'], description='')
 @marshal_with(AnswerSchema())
 @content.route('/answers', methods=['POST'])
-@requires_auth
 def create_answer(*args, **kwargs):
     request_data = request.get_json()
-    user = get_user(db, kwargs['user_id'])
-    request_data['author_id'] = user['_id']
+    user = auth.get_user_by_email('hello@kodesmil.com')
+    request_data['author_id'] = user.uid
     result = db.answers.insert_one(AnswerSchema().load(request_data))
     if result.acknowledged:
         return '', 201
@@ -26,11 +28,10 @@ def create_answer(*args, **kwargs):
 @doc(tags=['Answer'], description='')
 @marshal_with(AnswerSchema())
 @content.route('/answers', methods=['GET'])
-@requires_auth
 def get_answers(*args, **kwargs):
-    user = get_user(db, kwargs['user_id'])
+    user = auth.get_user_by_email('hello@kodesmil.com')
     answers = db.answers \
-        .find({'user_id': user['_user:id']}) \
+        .find({'user_id': user.uid}) \
         .sort('_id', -1) \
         .limit(1)
     return jsonify(AnswerSchema().dump(

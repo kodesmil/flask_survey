@@ -10,8 +10,11 @@ flask_apispec
 Flask-PyMongo
 requests
 pymongo[srv]
+dnspython
 httplib2
+google-api-python-client==1.8.0
 oauth2client
 python-dateutil
-dnspython
+ptvsd
 kodesmil_common==0.0.14
+firebase-admin
