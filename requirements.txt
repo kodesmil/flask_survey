@@ -16,5 +16,5 @@ google-api-python-client==1.8.0
 oauth2client
 python-dateutil
 ptvsd
-kodesmil_common==0.0.14
+kodesmil_common==0.0.15
 firebase-admin
